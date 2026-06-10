@@ -1,0 +1,8 @@
+{
+  "symbols": ["AAPL", "BTC-USD"],
+  "searchQueries": [],
+  "includeHistorical": true,
+  "historicalRange": "5d",
+  "historicalInterval": "1d",
+  "proxyConfiguration": { "useApifyProxy": true }
+}
