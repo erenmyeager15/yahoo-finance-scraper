@@ -1,0 +1,55 @@
+{
+  "title": "Yahoo Finance Scraper",
+  "description": "Provide stock or crypto ticker symbols (or search queries) to extract quotes and optional historical price data from Yahoo Finance. No login or API key required.",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "symbols": {
+      "title": "Ticker Symbols",
+      "description": "Stock or crypto symbols, e.g. \"AAPL\", \"MSFT\", \"BTC-USD\", \"EURUSD=X\".",
+      "type": "array",
+      "editor": "stringList",
+      "prefill": ["AAPL", "MSFT", "BTC-USD"],
+      "default": ["AAPL"]
+    },
+    "searchQueries": {
+      "title": "Search Queries",
+      "description": "Company or asset names to look up and resolve to ticker symbols (e.g. \"apple\", \"bitcoin\").",
+      "type": "array",
+      "editor": "stringList",
+      "default": []
+    },
+    "includeHistorical": {
+      "title": "Include Historical Prices",
+      "description": "If enabled, each quote includes a historical OHLCV time series.",
+      "type": "boolean",
+      "editor": "checkbox",
+      "default": false
+    },
+    "historicalRange": {
+      "title": "Historical Range",
+      "description": "Time range for historical data (used when 'Include Historical Prices' is on).",
+      "type": "string",
+      "editor": "select",
+      "default": "1mo",
+      "enum": ["1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y", "10y", "ytd", "max"],
+      "enumTitles": ["1 Day", "5 Days", "1 Month", "3 Months", "6 Months", "1 Year", "2 Years", "5 Years", "10 Years", "Year to Date", "Max"]
+    },
+    "historicalInterval": {
+      "title": "Historical Interval",
+      "description": "Candle interval for historical data.",
+      "type": "string",
+      "editor": "select",
+      "default": "1d",
+      "enum": ["1m", "5m", "15m", "30m", "60m", "1d", "1wk", "1mo"],
+      "enumTitles": ["1 Minute", "5 Minutes", "15 Minutes", "30 Minutes", "60 Minutes", "1 Day", "1 Week", "1 Month"]
+    },
+    "proxyConfiguration": {
+      "title": "Proxy Configuration",
+      "description": "Proxy settings. Yahoo Finance is generally open; enable proxies to avoid rate limits on large runs.",
+      "type": "object",
+      "editor": "proxy",
+      "default": { "useApifyProxy": true }
+    }
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "actorSpecification": 1,
+  "name": "yahoo-finance-scraper",
+  "title": "Yahoo Finance Scraper - Stocks, Crypto & Historical Data",
+  "description": "Scrape stock and crypto quotes plus historical OHLCV data from Yahoo Finance. Get price, 52-week range, volume, exchange, and price history for any ticker. No login or API key needed.",
+  "version": "1.0",
+  "categories": ["BUSINESS", "DEVELOPER_TOOLS"],
+  "dockerfile": "Dockerfile",
+  "input": "../INPUT_SCHEMA.json",
+  "storages": {
+    "dataset": {
+      "actorSpecification": 1,
+      "views": {
+        "quotes": {
+          "title": "Quotes",
+          "transformation": {
+            "fields": ["symbol", "name", "instrumentType", "price", "previousClose", "change", "changePercent", "dayHigh", "dayLow", "fiftyTwoWeekHigh", "fiftyTwoWeekLow", "volume", "currency", "exchange", "marketTime", "historicalCount", "scrapedAt"]
+          },
+          "display": {
+            "component": "table",
+            "properties": {
+              "symbol": { "label": "Symbol", "format": "text" },
+              "name": { "label": "Name", "format": "text" },
+              "instrumentType": { "label": "Type", "format": "text" },
+              "price": { "label": "Price", "format": "number" },
+              "previousClose": { "label": "Prev Close", "format": "number" },
+              "change": { "label": "Change", "format": "number" },
+              "changePercent": { "label": "Change %", "format": "number" },
+              "dayHigh": { "label": "Day High", "format": "number" },
+              "dayLow": { "label": "Day Low", "format": "number" },
+              "fiftyTwoWeekHigh": { "label": "52W High", "format": "number" },
+              "fiftyTwoWeekLow": { "label": "52W Low", "format": "number" },
+              "volume": { "label": "Volume", "format": "number" },
+              "currency": { "label": "Currency", "format": "text" },
+              "exchange": { "label": "Exchange", "format": "text" },
+              "marketTime": { "label": "Market Time", "format": "text" },
+              "historicalCount": { "label": "History Bars", "format": "number" },
+              "scrapedAt": { "label": "Scraped At", "format": "text" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "pricingInfo": {
+    "pricingModel": "PAY_PER_EVENT",
+    "pricingPerEvent": {
+      "actorChargeEvents": {
+        "quote-scraped": {
+          "eventTitle": "Quote Scraped",
+          "eventDescription": "Charged for each ticker quote extracted (includes optional historical price data).",
+          "eventPriceUsd": 0.002
+        }
+      }
+    }
+  },
+  "defaultRunOptions": {
+    "build": "latest",
+    "memoryMbytes": 1024,
+    "timeoutSecs": 3600
+  },
+  "minMemoryMbytes": 256,
+  "maxMemoryMbytes": 4096
+}
