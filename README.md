@@ -75,6 +75,14 @@ This Actor uses **pay-per-result** pricing:
 
 Each ticker is one charge, including its optional historical price series. You are only charged for quotes actually returned. Apify platform usage is billed separately by Apify.
 
+## How to Scrape Yahoo Finance (Step by Step)
+
+1. Click **Try for free** / **Run**.
+2. Enter `symbols` (e.g. `AAPL`, `BTC-USD`, `EURUSD=X`), or add `searchQueries` to resolve names to tickers.
+3. Toggle `includeHistorical` if you want OHLCV history, then pick a `historicalRange` and `historicalInterval`.
+4. Run the Actor (start with a few tickers to test).
+5. Export the results as JSON, CSV, Excel, or HTML, or pull them via the Apify API.
+
 ## Use cases
 
 - **Portfolio & watchlist tracking** - pull live prices on a schedule
