@@ -4,6 +4,8 @@ Scrape **stock and crypto market data from Yahoo Finance** - no login, no API ke
 
 Perfect for **portfolio tracking, quant research, trading bots, dashboards, and market analysis**.
 
+This Actor provides public market data for research and informational use only. It is not financial advice.
+
 ## Features
 
 - ✅ **No login or API key** - uses Yahoo Finance's public chart API
@@ -22,7 +24,7 @@ Perfect for **portfolio tracking, quant research, trading bots, dashboards, and 
 | `includeHistorical` | `boolean` | Include historical OHLCV in each quote | `false` |
 | `historicalRange` | `string` | `1d`/`5d`/`1mo`/`3mo`/`6mo`/`1y`/`2y`/`5y`/`10y`/`ytd`/`max` | `1mo` |
 | `historicalInterval` | `string` | `1m`/`5m`/`15m`/`30m`/`60m`/`1d`/`1wk`/`1mo` | `1d` |
-| `proxyConfiguration` | `object` | Proxy (helps avoid rate limits on large runs) | Apify Proxy |
+| `proxyConfiguration` | `object` | Optional proxy for large runs | Disabled |
 
 ### Example input
 
@@ -36,7 +38,15 @@ Perfect for **portfolio tracking, quant research, trading bots, dashboards, and 
 }
 ```
 
-## Sample output
+## Output dataset
+
+The Actor saves one quote row per unique ticker. Rows include symbol, name, instrument
+type, price, previous close, change, change percent, day range, 52-week range, volume,
+currency, exchange, market time, historical bar count, optional OHLCV history, and
+`scrapedAt` timestamp. Export the dataset as JSON, CSV, Excel, or HTML, or consume it
+through the Apify API.
+
+### Sample output
 
 ```json
 {
@@ -73,7 +83,7 @@ This Actor uses **pay-per-result** pricing:
 |-------|-------|
 | Per quote scraped | **$0.002** ($2 / 1,000 tickers) |
 
-Each ticker is one charge, including its optional historical price series. You are only charged for quotes actually returned. Apify platform usage is billed separately by Apify.
+Each unique ticker is saved and charged atomically, including its optional historical price series. Overlapping symbols from direct input and searches are skipped, and the Actor stops further requests when the user's spending limit is reached. Optional proxy usage is disabled by default.
 
 ## How to Scrape Yahoo Finance (Step by Step)
 

@@ -7,6 +7,8 @@
   "categories": ["BUSINESS", "DEVELOPER_TOOLS"],
   "dockerfile": "Dockerfile",
   "input": "../INPUT_SCHEMA.json",
+  "readme": "../README.md",
+  "output": "./output_schema.json",
   "storages": {
     "dataset": {
       "actorSpecification": 1,
@@ -56,7 +58,7 @@
   },
   "defaultRunOptions": {
     "build": "latest",
-    "memoryMbytes": 1024,
+    "memoryMbytes": 512,
     "timeoutSecs": 3600
   },
   "minMemoryMbytes": 256,

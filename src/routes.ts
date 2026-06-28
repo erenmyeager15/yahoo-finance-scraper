@@ -7,6 +7,11 @@ interface RouterOpts {
     historicalRange: string;
     historicalInterval: string;
     chartUrl: (symbol: string) => string;
+    control: {
+        spendingLimitReached: boolean;
+        savedQuotes: number;
+        seenSymbols: Set<string>;
+    };
 }
 
 const num = (v: unknown): number | null => (typeof v === 'number' && Number.isFinite(v) ? v : null);
@@ -81,6 +86,11 @@ function mapQuote(result: any, opts: RouterOpts): QuoteRecord {
 export function buildRouter(opts: RouterOpts) {
     return async (ctx: HttpCrawlingContext): Promise<void> => {
         const { request, crawler } = ctx;
+        if (opts.control.spendingLimitReached) {
+            await crawler.autoscaledPool?.abort();
+            return;
+        }
+
         const data = parseBody(ctx);
         const label = (request.userData.label as string) ?? 'CHART';
 
@@ -107,8 +117,33 @@ export function buildRouter(opts: RouterOpts) {
             return;
         }
         const record = mapQuote(result, opts);
-        await Actor.pushData(record);
-        await Actor.charge({ eventName: 'quote-scraped' }).catch(() => null);
+        const symbolKey = record.symbol.trim().toUpperCase();
+        if (opts.control.seenSymbols.has(symbolKey)) {
+            log.debug(`Skipping duplicate quote for ${record.symbol}.`);
+            return;
+        }
+
+        opts.control.seenSymbols.add(symbolKey);
+        try {
+            const chargeResult = await Actor.pushData(record, 'quote-scraped');
+            const recordWasSaved = chargeResult.chargedCount > 0 || !chargeResult.eventChargeLimitReached;
+            if (recordWasSaved) {
+                opts.control.savedQuotes += 1;
+            }
+
+            if (chargeResult.eventChargeLimitReached) {
+                opts.control.spendingLimitReached = true;
+                const message = `Stopped at the user's spending limit after ${opts.control.savedQuotes} quote(s).`;
+                await Actor.setStatusMessage(message);
+                log.warning(message);
+                await crawler.autoscaledPool?.abort();
+                return;
+            }
+        } catch (error) {
+            opts.control.seenSymbols.delete(symbolKey);
+            throw error;
+        }
+
         log.info(`${record.symbol}: ${record.price ?? 'n/a'} ${record.currency ?? ''} (${record.changePercent ?? 0}%)${record.historicalCount ? ` + ${record.historicalCount} bars` : ''}`);
     };
 }

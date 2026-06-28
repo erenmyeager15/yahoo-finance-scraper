@@ -25,7 +25,9 @@ if (cleanSymbols.length === 0 && cleanQueries.length === 0) {
 
 log.info(`Starting Yahoo Finance scrape: ${cleanSymbols.length} symbol(s), ${cleanQueries.length} search(es).`);
 
-const proxyConfiguration = await Actor.createProxyConfiguration(proxyInput ?? { useApifyProxy: true });
+const proxyConfiguration = (proxyInput?.useApifyProxy || proxyInput?.proxyUrls?.length)
+    ? await Actor.createProxyConfiguration(proxyInput)
+    : undefined;
 
 function chartUrl(symbol: string): string {
     const params = new URLSearchParams({ interval: historicalInterval, range: includeHistorical ? historicalRange : '5d' });
@@ -43,7 +45,13 @@ const startRequests = [
     })),
 ];
 
-const router = buildRouter({ includeHistorical, historicalRange, historicalInterval, chartUrl });
+const control = {
+    spendingLimitReached: false,
+    savedQuotes: 0,
+    seenSymbols: new Set<string>(),
+};
+
+const router = buildRouter({ includeHistorical, historicalRange, historicalInterval, chartUrl, control });
 
 const crawler = new HttpCrawler({
     proxyConfiguration,
@@ -55,10 +63,14 @@ const crawler = new HttpCrawler({
     retryOnBlocked: true,
     sessionPoolOptions: { maxPoolSize: 50, sessionOptions: { maxUsageCount: 30 } },
     failedRequestHandler: async ({ request }, error) => {
+        if (control.spendingLimitReached) return;
         log.warning(`Failed: ${request.url} - ${(error as Error)?.message ?? error}`);
     },
 });
 
 await crawler.run(startRequests);
-log.info('Yahoo Finance scrape finished.');
+if (!control.spendingLimitReached) {
+    await Actor.setStatusMessage(`Finished with ${control.savedQuotes} unique quote(s).`);
+    log.info(`Yahoo Finance scrape finished with ${control.savedQuotes} unique quote(s).`);
+}
 await Actor.exit();

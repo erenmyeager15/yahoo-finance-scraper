@@ -1,0 +1,14 @@
+{
+  "actorOutputSchemaVersion": 1,
+  "title": "Yahoo Finance Scraper Output",
+  "description": "Structured Yahoo Finance quote records with symbols, company names, instrument type, prices, previous close, changes, day ranges, 52-week ranges, volume, currency, exchange, market time, historical bar count, and scraped timestamps.",
+  "type": "object",
+  "properties": {
+    "results": {
+      "type": "string",
+      "title": "Yahoo Finance quote records",
+      "description": "Clean dataset items containing public stock and crypto quote, price movement, volume, exchange, market time, and optional historical count data.",
+      "template": "{{links.apiDefaultDatasetUrl}}/items"
+    }
+  }
+}
