@@ -21,7 +21,7 @@
     },
     "includeHistorical": {
       "title": "Include Historical Prices",
-      "description": "If enabled, each quote includes a historical OHLCV time series.",
+      "description": "If enabled, each quote includes a historical OHLCV time series. Keep this off for the cheapest first run.",
       "type": "boolean",
       "editor": "checkbox",
       "default": false

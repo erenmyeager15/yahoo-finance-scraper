@@ -2,7 +2,9 @@
   "symbols": ["AAPL"],
   "searchQueries": [],
   "includeHistorical": false,
-  "historicalRange": "5d",
+  "historicalRange": "1mo",
   "historicalInterval": "1d",
-  "proxyConfiguration": { "useApifyProxy": false }
+  "proxyConfiguration": {
+    "useApifyProxy": false
+  }
 }

@@ -1,52 +1,55 @@
 # Yahoo Finance Scraper - Stocks, Crypto & Historical Data
 
-Scrape **stock and crypto market data from Yahoo Finance** - no login, no API key required. Get real-time quotes, day and 52-week ranges, volume, exchange info, and full **historical OHLCV** price data for any ticker. Look up symbols by company/asset name. Export to **JSON, CSV, Excel, or HTML**, or pull via the Apify API.
+Scrape public Yahoo Finance quote data for stocks, ETFs, indices, forex pairs, and crypto tickers. The Actor returns one clean row per ticker with price, previous close, change, day range, 52-week range, volume, currency, exchange, market time, and optional historical OHLCV bars.
 
-Perfect for **portfolio tracking, quant research, trading bots, dashboards, and market analysis**.
+Use it for watchlists, dashboards, market research, data enrichment, and scheduled exports. It does not require a login or API key. This Actor provides public market data for research and informational use only; it is not financial advice.
 
-This Actor provides public market data for research and informational use only. It is not financial advice.
-
-## Features
-
-- ✅ **No login or API key** - uses Yahoo Finance's public chart API
-- ✅ **Stocks, crypto, forex, ETFs, indices** - any Yahoo ticker (e.g. `AAPL`, `BTC-USD`, `EURUSD=X`)
-- ✅ **Symbol search** - resolve company/asset names to tickers
-- ✅ **Live quote** - price, change, day & 52-week high/low, volume, exchange
-- ✅ **Historical OHLCV** - open/high/low/close/adjusted-close/volume across many ranges & intervals
-- ✅ **Fast & lightweight** - pure JSON, no headless browser
-
-## Input
-
-| Parameter | Type | Description | Default |
-|-----------|------|-------------|---------|
-| `symbols` | `string[]` | Ticker symbols, e.g. `"AAPL"`, `"BTC-USD"` | `["AAPL"]` |
-| `searchQueries` | `string[]` | Names to resolve to tickers (e.g. `"tesla"`) | `[]` |
-| `includeHistorical` | `boolean` | Include historical OHLCV in each quote | `false` |
-| `historicalRange` | `string` | `1d`/`5d`/`1mo`/`3mo`/`6mo`/`1y`/`2y`/`5y`/`10y`/`ytd`/`max` | `1mo` |
-| `historicalInterval` | `string` | `1m`/`5m`/`15m`/`30m`/`60m`/`1d`/`1wk`/`1mo` | `1d` |
-| `proxyConfiguration` | `object` | Optional proxy for large runs | Disabled |
-
-### Example input
+## Quick Start
 
 ```json
 {
-  "symbols": ["AAPL", "MSFT", "BTC-USD"],
-  "searchQueries": ["tesla"],
-  "includeHistorical": true,
+  "symbols": ["AAPL"],
+  "searchQueries": [],
+  "includeHistorical": false,
   "historicalRange": "1mo",
-  "historicalInterval": "1d"
+  "historicalInterval": "1d",
+  "proxyConfiguration": {
+    "useApifyProxy": false
+  }
 }
 ```
 
-## Output dataset
+This retrieves one quote without historical bars, keeping the first run fast and low-cost.
 
-The Actor saves one quote row per unique ticker. Rows include symbol, name, instrument
-type, price, previous close, change, change percent, day range, 52-week range, volume,
-currency, exchange, market time, historical bar count, optional OHLCV history, and
-`scrapedAt` timestamp. Export the dataset as JSON, CSV, Excel, or HTML, or consume it
-through the Apify API.
+## Input
 
-### Sample output
+| Field | Type | Default | Notes |
+| --- | --- | --- | --- |
+| `symbols` | string array | `["AAPL"]` | Yahoo ticker symbols such as `AAPL`, `MSFT`, `BTC-USD`, `EURUSD=X`, or `^GSPC`. |
+| `searchQueries` | string array | `[]` | Company or asset names to resolve to ticker symbols. |
+| `includeHistorical` | boolean | `false` | Include OHLCV bars inside each quote row. |
+| `historicalRange` | string | `1mo` | Range used when historical prices are enabled. |
+| `historicalInterval` | string | `1d` | Candle interval used when historical prices are enabled. |
+| `proxyConfiguration` | object | disabled | Usually not needed for small public API runs. Enable only for larger or repeated runs. |
+
+## Output
+
+Each dataset row is one unique ticker:
+
+| Field | Description |
+| --- | --- |
+| `symbol`, `name`, `instrumentType` | Ticker and Yahoo Finance metadata. |
+| `price`, `previousClose`, `change`, `changePercent` | Current quote and price movement. |
+| `dayHigh`, `dayLow` | Intraday range. |
+| `fiftyTwoWeekHigh`, `fiftyTwoWeekLow` | 52-week range when available. |
+| `volume`, `currency`, `exchange` | Market metadata. |
+| `marketTime` | Quote timestamp. |
+| `historicalRange`, `historicalInterval`, `historicalCount`, `history` | Optional OHLCV time series details. |
+| `scrapedAt` | Actor scrape timestamp. |
+
+## Verified Sample
+
+An existing successful run for `AAPL` returned this row:
 
 ```json
 {
@@ -55,62 +58,44 @@ through the Apify API.
   "instrumentType": "EQUITY",
   "currency": "USD",
   "exchange": "NasdaqGS",
-  "price": 291.58,
-  "previousClose": 310.26,
-  "change": -18.68,
-  "changePercent": -6.02,
-  "dayHigh": 294.74,
-  "dayLow": 287.38,
-  "fiftyTwoWeekHigh": 317.4,
-  "fiftyTwoWeekLow": 195.07,
-  "volume": 49237715,
-  "marketTime": "2026-06-10T20:00:01.000Z",
-  "historicalRange": "5d",
-  "historicalInterval": "1d",
-  "historicalCount": 5,
-  "history": [
-    { "date": "2026-06-10T13:30:00.000Z", "open": 290.74, "high": 294.74, "low": 287.38, "close": 291.58, "adjClose": 291.58, "volume": 49237715 }
-  ],
-  "scrapedAt": "2026-06-11T10:00:00.000Z"
+  "price": 298.01,
+  "previousClose": 295.63,
+  "change": 2.38,
+  "changePercent": 0.81,
+  "volume": 85962201,
+  "marketTime": "2026-06-18T20:00:01.000Z",
+  "historicalCount": 0
 }
 ```
 
 ## Pricing
 
-This Actor uses **pay-per-result** pricing:
+Active pay-per-event pricing:
 
 | Event | Price |
-|-------|-------|
-| Per quote scraped | **$0.002** ($2 / 1,000 tickers) |
+| --- | ---: |
+| `quote-scraped` | `$0.002` per ticker quote |
+| `apify-actor-start` | `$0.00005` per GB at run start |
 
-Each unique ticker is saved and charged atomically, including its optional historical price series. Overlapping symbols from direct input and searches are skipped, and the Actor stops further requests when the user's spending limit is reached. Optional proxy usage is disabled by default.
+Each unique ticker is saved and charged atomically, including optional historical data when enabled. Duplicate symbols from direct input and search results are skipped, and the Actor stops further requests when the user's spending limit is reached.
 
-## How to Scrape Yahoo Finance (Step by Step)
+## Common Workflows
 
-1. Click **Try for free** / **Run**.
-2. Enter `symbols` (e.g. `AAPL`, `BTC-USD`, `EURUSD=X`), or add `searchQueries` to resolve names to tickers.
-3. Toggle `includeHistorical` if you want OHLCV history, then pick a `historicalRange` and `historicalInterval`.
-4. Run the Actor (start with a few tickers to test).
-5. Export the results as JSON, CSV, Excel, or HTML, or pull them via the Apify API.
+1. Pull a scheduled watchlist for stocks, ETFs, crypto, forex, or indices.
+2. Resolve company names through `searchQueries`, then fetch the matching quote rows.
+3. Enable historical bars for small ticker sets when you need OHLCV data.
+4. Export to CSV, Excel, JSON, HTML, or connect through the Apify API.
 
-## Use cases
+## Notes and Limits
 
-- **Portfolio & watchlist tracking** - pull live prices on a schedule
-- **Quant research & backtesting** - bulk historical OHLCV across many tickers
-- **Dashboards & alerts** - feed prices into BI tools or notifications
-- **Crypto + forex monitoring** - `BTC-USD`, `ETH-USD`, `EURUSD=X`, and more
-
-## Tips
-
-- Symbols follow Yahoo's format: crypto as `BTC-USD`, forex as `EURUSD=X`, indices as `^GSPC`.
-- Turn on `includeHistorical` and pick a `historicalRange` / `historicalInterval` for time-series data.
-- Use `searchQueries` when you know the name but not the exact ticker.
+- Symbols must follow Yahoo Finance format, for example `BTC-USD`, `EURUSD=X`, or `^GSPC`.
+- Market data availability, delay, and coverage follow Yahoo Finance.
+- Historical data increases response size and runtime; test with one or two symbols first.
+- This Actor is for data extraction and research workflows, not investment recommendations.
 
 ## Responsible Use
 
-This Actor is intended for lawful collection of publicly available information only. Users are responsible for ensuring their use complies with the source website's terms, robots.txt, applicable privacy laws, including India's DPDP Act, and all local regulations.
-
-Do not use this Actor to collect, store, sell, or misuse personal data without a lawful basis. The Actor author is not responsible for misuse by end users.
+Use this Actor for lawful collection of publicly available market data. Respect Yahoo Finance terms and any rules that apply to how you store, redistribute, or use exported financial data.
 
 ## License
 

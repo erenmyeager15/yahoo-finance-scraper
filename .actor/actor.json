@@ -4,11 +4,15 @@
   "title": "Yahoo Finance Scraper - Stocks, Crypto & Historical Data",
   "description": "Scrape stock and crypto quotes plus historical OHLCV data from Yahoo Finance. Get price, 52-week range, volume, exchange, and price history for any ticker. No login or API key needed.",
   "version": "1.0",
-  "categories": ["BUSINESS", "DEVELOPER_TOOLS"],
+  "categories": ["BUSINESS", "DEVELOPER_TOOLS", "OTHER"],
   "dockerfile": "Dockerfile",
   "input": "../INPUT_SCHEMA.json",
   "readme": "../README.md",
   "output": "./output_schema.json",
+  "exampleRunInput": {
+    "body": "{\"symbols\":[\"AAPL\"],\"searchQueries\":[],\"includeHistorical\":false,\"historicalRange\":\"1mo\",\"historicalInterval\":\"1d\",\"proxyConfiguration\":{\"useApifyProxy\":false}}",
+    "contentType": "application/json; charset=utf-8"
+  },
   "storages": {
     "dataset": {
       "actorSpecification": 1,
@@ -48,9 +52,17 @@
     "pricingModel": "PAY_PER_EVENT",
     "pricingPerEvent": {
       "actorChargeEvents": {
+        "apify-actor-start": {
+          "eventTitle": "Actor Start",
+          "eventDescription": "Charged when the Actor starts running. Number of events charged depends on Actor memory (one event per GB, minimum one event).",
+          "isOneTimeEvent": true,
+          "eventPriceUsd": 0.00005
+        },
         "quote-scraped": {
           "eventTitle": "Quote Scraped",
           "eventDescription": "Charged for each ticker quote extracted (includes optional historical price data).",
+          "isOneTimeEvent": false,
+          "isPrimaryEvent": true,
           "eventPriceUsd": 0.002
         }
       }
@@ -62,5 +74,5 @@
     "timeoutSecs": 3600
   },
   "minMemoryMbytes": 256,
-  "maxMemoryMbytes": 4096
+  "maxMemoryMbytes": 2048
 }
