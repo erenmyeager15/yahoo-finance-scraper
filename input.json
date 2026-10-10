@@ -4,6 +4,12 @@
   "includeHistorical": false,
   "historicalRange": "1mo",
   "historicalInterval": "1d",
+  "trackChanges": true,
+  "monitorName": "us-market-watchlist",
+  "observationHistoryLimit": 10,
+  "priceChangePercentThreshold": 2,
+  "volumeChangePercentThreshold": 50,
+  "near52WeekBoundaryPercent": 2,
   "proxyConfiguration": {
     "useApifyProxy": false
   }

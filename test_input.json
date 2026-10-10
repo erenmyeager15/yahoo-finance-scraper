@@ -1,8 +1,14 @@
 {
-  "symbols": ["AAPL"],
+  "symbols": ["AAPL", "MSFT", "NVDA", "SPY", "BTC-USD"],
   "searchQueries": [],
-  "includeHistorical": false,
-  "historicalRange": "5d",
+  "includeHistorical": true,
+  "historicalRange": "3mo",
   "historicalInterval": "1d",
+  "trackChanges": true,
+  "monitorName": "local-us-market-analytics",
+  "observationHistoryLimit": 5,
+  "priceChangePercentThreshold": 2,
+  "volumeChangePercentThreshold": 50,
+  "near52WeekBoundaryPercent": 2,
   "proxyConfiguration": { "useApifyProxy": false }
 }

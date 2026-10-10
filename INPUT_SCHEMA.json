@@ -1,6 +1,6 @@
 {
-  "title": "Yahoo Finance Scraper",
-  "description": "Provide stock or crypto ticker symbols (or search queries) to extract quotes and optional historical price data from Yahoo Finance. No login or API key required.",
+  "title": "Yahoo Finance US Market Watchlist & Price Monitor",
+  "description": "Track stocks, ETFs, indices, forex, and crypto with current quotes, optional OHLCV analytics, and repeat-run change reports. No login or API key required.",
   "type": "object",
   "schemaVersion": 1,
   "properties": {
@@ -10,14 +10,16 @@
       "type": "array",
       "editor": "stringList",
       "prefill": ["AAPL", "MSFT", "BTC-USD"],
-      "default": ["AAPL"]
+      "default": ["AAPL"],
+      "maxItems": 250
     },
     "searchQueries": {
       "title": "Search Queries",
       "description": "Company or asset names to look up and resolve to ticker symbols (e.g. \"apple\", \"bitcoin\").",
       "type": "array",
       "editor": "stringList",
-      "default": []
+      "default": [],
+      "maxItems": 50
     },
     "includeHistorical": {
       "title": "Include Historical Prices",
@@ -43,6 +45,58 @@
       "default": "1d",
       "enum": ["1m", "5m", "15m", "30m", "60m", "1d", "1wk", "1mo"],
       "enumTitles": ["1 Minute", "5 Minutes", "15 Minutes", "30 Minutes", "60 Minutes", "1 Day", "1 Week", "1 Month"]
+    },
+    "trackChanges": {
+      "title": "Track Changes Between Runs",
+      "description": "Save bounded private observations and add baseline, updated, unchanged, or partial status to every quote. Also creates Markdown and CSV change reports.",
+      "type": "boolean",
+      "editor": "checkbox",
+      "default": true
+    },
+    "monitorName": {
+      "title": "Watchlist Name",
+      "description": "Stable private name for this scheduled watchlist. Reuse the same name to compare later runs.",
+      "type": "string",
+      "editor": "textfield",
+      "default": "us-market-watchlist",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "observationHistoryLimit": {
+      "title": "Private History per Ticker",
+      "description": "Maximum recent observations retained per symbol in the private watchlist store.",
+      "type": "integer",
+      "editor": "number",
+      "default": 10,
+      "minimum": 2,
+      "maximum": 50
+    },
+    "priceChangePercentThreshold": {
+      "title": "Price Change Signal (%)",
+      "description": "Mark a ticker updated when its current price moves by at least this percentage from the previous watchlist observation.",
+      "type": "number",
+      "editor": "number",
+      "default": 2,
+      "minimum": 0,
+      "maximum": 1000
+    },
+    "volumeChangePercentThreshold": {
+      "title": "Volume Change Signal (%)",
+      "description": "Mark a ticker updated when reported volume moves by at least this percentage from the previous observation.",
+      "type": "number",
+      "editor": "number",
+      "default": 50,
+      "minimum": 0,
+      "maximum": 1000
+    },
+    "near52WeekBoundaryPercent": {
+      "title": "Near 52-Week High/Low (%)",
+      "description": "Add a descriptive signal when price is within this percentage of the reported 52-week high or low.",
+      "type": "number",
+      "editor": "number",
+      "default": 2,
+      "minimum": 0,
+      "maximum": 100
     },
     "proxyConfiguration": {
       "title": "Proxy Configuration",

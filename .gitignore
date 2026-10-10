@@ -1,6 +1,7 @@
 node_modules/
 dist/
 .apify/
+.apify-local-*/
 storage/
 apify_storage/
 crawlee_storage/

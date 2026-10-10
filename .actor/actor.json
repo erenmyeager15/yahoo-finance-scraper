@@ -1,16 +1,16 @@
 {
   "actorSpecification": 1,
   "name": "yahoo-finance-scraper",
-  "title": "Yahoo Finance Scraper - Stocks, Crypto & Historical Data",
-  "description": "Scrape stock and crypto quotes plus historical OHLCV data from Yahoo Finance. Get price, 52-week range, volume, exchange, and price history for any ticker. No login or API key needed.",
-  "version": "1.0",
+  "title": "Yahoo Finance Market Monitor - Stocks, ETFs & Crypto",
+  "description": "Monitor US and global tickers with Yahoo Finance quotes, threshold signals, repeat-run change reports, 52-week position, and optional OHLCV analytics. No API key needed.",
+  "version": "1.1",
   "categories": ["BUSINESS", "DEVELOPER_TOOLS", "OTHER"],
   "dockerfile": "Dockerfile",
   "input": "../INPUT_SCHEMA.json",
   "readme": "../README.md",
   "output": "./output_schema.json",
   "exampleRunInput": {
-    "body": "{\"symbols\":[\"AAPL\"],\"searchQueries\":[],\"includeHistorical\":false,\"historicalRange\":\"1mo\",\"historicalInterval\":\"1d\",\"proxyConfiguration\":{\"useApifyProxy\":false}}",
+    "body": "{\"symbols\":[\"AAPL\"],\"searchQueries\":[],\"includeHistorical\":false,\"historicalRange\":\"1mo\",\"historicalInterval\":\"1d\",\"trackChanges\":true,\"monitorName\":\"us-market-watchlist\",\"priceChangePercentThreshold\":2,\"volumeChangePercentThreshold\":50,\"near52WeekBoundaryPercent\":2,\"proxyConfiguration\":{\"useApifyProxy\":false}}",
     "contentType": "application/json; charset=utf-8"
   },
   "storages": {
@@ -20,15 +20,19 @@
         "quotes": {
           "title": "Quotes",
           "transformation": {
-            "fields": ["symbol", "name", "instrumentType", "price", "previousClose", "change", "changePercent", "dayHigh", "dayLow", "fiftyTwoWeekHigh", "fiftyTwoWeekLow", "volume", "currency", "exchange", "marketTime", "historicalCount", "scrapedAt"]
+            "fields": ["symbol", "name", "monitoringStatus", "changeSeverity", "price", "previousPrice", "priceDeltaPercent", "volume", "volumeDeltaPercent", "positionIn52WeekRangePercent", "distanceFrom52WeekHighPercent", "sma20", "sma50", "rsi14", "returnVolatilityPercent", "maxDrawdownPercent", "marketState", "currency", "exchange", "marketTime", "sourceUrl", "historicalCount", "scrapedAt"]
           },
           "display": {
             "component": "table",
             "properties": {
               "symbol": { "label": "Symbol", "format": "text" },
               "name": { "label": "Name", "format": "text" },
+              "monitoringStatus": { "label": "Monitor Status", "format": "text" },
+              "changeSeverity": { "label": "Severity", "format": "text" },
               "instrumentType": { "label": "Type", "format": "text" },
               "price": { "label": "Price", "format": "number" },
+              "previousPrice": { "label": "Previous Observation", "format": "number" },
+              "priceDeltaPercent": { "label": "Observed Price Δ %", "format": "number" },
               "previousClose": { "label": "Prev Close", "format": "number" },
               "change": { "label": "Change", "format": "number" },
               "changePercent": { "label": "Change %", "format": "number" },
@@ -37,9 +41,19 @@
               "fiftyTwoWeekHigh": { "label": "52W High", "format": "number" },
               "fiftyTwoWeekLow": { "label": "52W Low", "format": "number" },
               "volume": { "label": "Volume", "format": "number" },
+              "volumeDeltaPercent": { "label": "Observed Volume Δ %", "format": "number" },
+              "positionIn52WeekRangePercent": { "label": "52W Position %", "format": "number" },
+              "distanceFrom52WeekHighPercent": { "label": "Distance from 52W High %", "format": "number" },
+              "sma20": { "label": "SMA 20", "format": "number" },
+              "sma50": { "label": "SMA 50", "format": "number" },
+              "rsi14": { "label": "RSI 14", "format": "number" },
+              "returnVolatilityPercent": { "label": "Return Volatility %", "format": "number" },
+              "maxDrawdownPercent": { "label": "Max Drawdown %", "format": "number" },
+              "marketState": { "label": "Market State", "format": "text" },
               "currency": { "label": "Currency", "format": "text" },
               "exchange": { "label": "Exchange", "format": "text" },
               "marketTime": { "label": "Market Time", "format": "text" },
+              "sourceUrl": { "label": "Yahoo Finance", "format": "link" },
               "historicalCount": { "label": "History Bars", "format": "number" },
               "scrapedAt": { "label": "Scraped At", "format": "text" }
             }
@@ -60,7 +74,7 @@
         },
         "quote-scraped": {
           "eventTitle": "Quote Scraped",
-          "eventDescription": "Charged for each ticker quote extracted (includes optional historical price data).",
+          "eventDescription": "Charged for each ticker quote saved, including monitoring fields, optional historical prices and calculated analytics.",
           "isOneTimeEvent": false,
           "isPrimaryEvent": true,
           "eventPriceUsd": 0.002
@@ -70,7 +84,7 @@
   },
   "defaultRunOptions": {
     "build": "latest",
-    "memoryMbytes": 512,
+    "memoryMbytes": 256,
     "timeoutSecs": 3600
   },
   "minMemoryMbytes": 256,
